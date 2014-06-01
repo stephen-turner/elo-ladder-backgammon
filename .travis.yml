@@ -1,7 +1,0 @@
-script: bash -ex .travis-ci.sh
-env:
-  global:
-    secure: nGO1vz1wSNC/ojNkdbVQarJeZSvog/tUNt6b9BhkAiIcmBugeozvgU9LRtk69YJA1FsYogg+NQ4Gbh0lU4wq9cIasi2/FaugtqU35saXofEeoXWhXN1h7T6zPM2uz9+dzJ3CgHd5I0xHkrAz2R7MHz5N4V1Fl3we/E9V6Yn08M0=
-  matrix:
-  - OCAML_VERSION=4.01.0 OPAM_VERSION=1.1.0
-language: c
