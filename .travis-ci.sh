@@ -32,8 +32,8 @@ eval `opam config -env`
 git clone http://github.com/stephen-turner/elo-ladder
 cd elo-ladder
 make
-./ladder json ../players ../games > ladder.json
-(echo set terminal png; ./ladder history --format=gnuplot ../players ../games) | gnuplot > ladder.png
+./ladder json --game=backgammon ../players ../games > ladder.json
+(echo set terminal png; ./ladder history --game=backgammon --format=gnuplot ../players ../games) | gnuplot > ladder.png
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo -e "Starting to update gh-pages\n"
