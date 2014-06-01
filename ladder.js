@@ -68,24 +68,23 @@ function build_ladder()
 	function build_rows(ps, active)
 	{
 		var i = 1;
-		var dps = 1;
 		var rows = ps.map(function(p){
 			var last = p.ratings[0];
 			var diff = 0;
 			if (p.ratings.length > 1)
-				diff = (last - p.ratings[1]).toFixed(dps);
+				diff = Math.round(last - p.ratings[1]);
 			if (active)
 				return [
 					i++,
 					p.name,
-					last.toFixed(dps),
+					Math.round(last),
 					motion(diff),
 					p.points_won + " / " + p.game_count
 				]
 			else
 				return [
 					p.name,
-					last.toFixed(dps),
+					Math.round(last),
 					p.points_won + " / " + p.game_count
 				]
 		}
@@ -94,12 +93,12 @@ function build_ladder()
 	}
 
 	var rows = build_rows(active_players, true);
-	var table = make_table(rows, ["Rank", "Name", "Rating", "Last diff", "Wins / Games"]);
+	var table = make_table(rows, ["Rank", "Name", "Rating", "Diff", "Score / Games"]);
 	div.appendChild(table);
 
 	div.innerHTML += "<h2>Retired Players</h2>";
 	var rows = build_rows(inactive_players, false);
-	var table = make_table(rows, ["Name", "Rating", "Wins / Games"]);
+	var table = make_table(rows, ["Name", "Rating", "Score / Games"]);
 	div.appendChild(table);
 }
 
@@ -122,12 +121,11 @@ function refresh_games_table(div, x)
 			p.date,
 			p.name1,
 			p.name2,
-			p.length,
 			string_of_result(p.result)
 		]}
 	);
 
-	var table = make_table(rows, ["Date", "Player 1", "Player 2", "Length", "Result"]);
+	var table = make_table(rows, ["Date", "White", "Black", "Result"]);
 	if (div.hasChildNodes())
 		div.removeChild(div.firstChild);
 	div.appendChild(table);
@@ -183,11 +181,14 @@ function build_suggestions()
 
 	var rows = suggestions.map(function(p){
 		return [
-			p.name1, p.name2,
+			p.name1 +
+			display_stakes(p.stake_win, p.stake_draw, p.stake_loss),
+			p.name2 +
+			display_stakes(-p.stake_loss, -p.stake_draw, -p.stake_win),
 		]}
 	);
 
-	var table = make_table(rows, ["Player 1", "Player 2"]);
+	var table = make_table(rows, ["White", "Black"]);
 	div.appendChild(table);
 }
 
@@ -214,8 +215,10 @@ function refresh_stats_table(div, x)
 				p.name1,
 				p.count,
 				p.losses,
+				p.draws,
 				p.wins,
 				average_result(-p.wins, -p.draws, -p.losses, p.count),
+				-p.balance
 			]
 		}
 		else {
@@ -227,22 +230,25 @@ function refresh_stats_table(div, x)
 				p.name2,
 				p.count,
 				p.wins,
+				p.draws,
 				p.losses,
 				average_result(p.wins, p.draws, p.losses, p.count),
+				p.balance
 			]
 		}
 	});
 	var avg = average_result(wins, draws, losses, count);
-	rows.push(["", "", bold(count), bold(wins), bold(losses), bold(avg)]);
+	rows.push(["", "", bold(count), bold(wins), bold(draws), bold(losses), bold(avg), bold(balance)]);
 
-	var table = make_table(rows, ["Player 1", "Player 2", "Games", "Wins*", "Losses*", "Average Result*"]);
+	var table = make_table(rows, ["Player 1", "Player 2", "Games", "Wins*", "Draws*", "Losses*", "Average Result*", "Colour Balance**"]);
 	if (div.hasChildNodes()) {
 		div.removeChild(div.firstChild);
 		div.removeChild(div.firstChild);
 	}
 	div.appendChild(table);
 
-	div.innerHTML += "<p>* For Player 1.</p>";
+	div.innerHTML += "<p>* For Player 1.<br />\
+		** The number of games Player 1 had white minus the number of games Player 2 had white.</p>";
 }
 
 function build_stats()
